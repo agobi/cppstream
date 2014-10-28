@@ -8,9 +8,9 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 1. Redistributions of source code must retain the above copyright 
+ * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright 
+ * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
  *
@@ -31,6 +31,7 @@
 #include <map>
 #include <cstdlib>
 #include <sys/time.h>
+#include <libgen.h>
 
 long timeval_diff(struct timeval &tv1, struct timeval &tv2)
 {
@@ -134,43 +135,49 @@ stream<long> change10 = times(10, 0, change10) + change5;
 stream<long> change20 = times(20, 0, change20) + change10;
 stream<long> change50 = times(50, 0, change50) + change20;
 
-int main(int, char *argv[]) {
-//    stream<long>::iterator it = change50.begin();
-//    for(int i=0; i<20; ++i) 
-//    {
-//        assert(change(i) == *it);
-//        std::cout<<i<<" "<<change(i)<<" "<<changef(i)<<" "<<changedyn(i)<<" "<<*it<<std::endl;
-//        ++it;
-//    }
+int main(int argc, char *argv[]) {
+    if (argc != 3)
+    {
+        std::cout<<" Usage: "<<basename(argv[0])<<" N X"<<std::endl
+                 <<"     N : Number to change"<<std::endl
+                 <<"     X : Algorithm"<<std::endl
+                 <<"         1 : map"<<std::endl
+                 <<"         2 : unordered map"<<std::endl
+                 <<"         3 : stream"<<std::endl
+                 <<std::endl;
+        return 1;
+    }
 
-    //std::cout<<j<<" "<<change(j)<<std::endl;
-    //std::cout<<j<<" "<<changef(j)<<std::endl;
+    const int n = atoi(argv[1]);
+    const int x = atoi(argv[2]);
 
-    const int n = atoi(argv[2]);
-    const int x = atoi(argv[1]);
-    
-	struct timeval tv1, tv2;
+    struct timeval tv1, tv2;
     struct timezone tz;
-	switch(x) {
-		case 1:
-			gettimeofday(&tv1, &tz);
-			changedyn0(n);
-			gettimeofday(&tv2, &tz);
-			break;
+    switch(x) {
+        case 1:
+            gettimeofday(&tv1, &tz);
+            changedyn0(n);
+            gettimeofday(&tv2, &tz);
+            break;
 
-		case 2:
-			gettimeofday(&tv1, &tz);
-			changedyn(n);
-			gettimeofday(&tv2, &tz);
-			break;
+        case 2:
+            gettimeofday(&tv1, &tz);
+            changedyn(n);
+            gettimeofday(&tv2, &tz);
+            break;
 
-		case 3:
-			gettimeofday(&tv1, &tz);
-			stream<long>::iterator it = change50.begin();
-			for(int i=0; i<n; ++i) ++it;
-			*it; 
-			gettimeofday(&tv2, &tz);
-			break;
-	}
+        default:
+            std::cerr<<"Unknown algorighm"<<std::endl;
+            return 1;
+
+        case 3:
+            gettimeofday(&tv1, &tz);
+            stream<long>::iterator it = change50.begin();
+            for(int i=0; i<n; ++i) ++it;
+            *it;
+            gettimeofday(&tv2, &tz);
+            break;
+
+    }
     std::cout<<timeval_diff(tv2, tv1)<<std::endl;
 }

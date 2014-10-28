@@ -94,7 +94,7 @@ public:
             return (*impl_)->get(*this);
         }
 
-        friend class stream<T>;
+        friend struct stream<T>;
 
     protected:
         iterator(impl ** impl)
